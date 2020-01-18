@@ -62,7 +62,6 @@ grassSound.set_volume(0.05)
 introImage = pygame.image.load('images/main_menu.jpg')
 
 
-
 # ======================= Functions =======================
 
     
@@ -152,11 +151,13 @@ class enemy(object):
         self.path = [self.x]
         self.idleCount = 0
         self.dieCount = 0
+        self.killCount = 0
         self.vel = 2
         self.hp = hp
         self.hitbox = (self.x + 12,self.y +5,45,70)
 
     def draw(self,display):
+        global killCount
         if self.idleCount + 1 >= 56:
             self.idleCount = 0
 
@@ -181,8 +182,9 @@ class enemy(object):
             enemy_health_color = red
         else:
             enemy_health_color = black
+
         
-        pygame.draw.rect(display, enemy_health_color, (self.x + 15, self.y, 40, 5))
+        pygame.draw.rect(display, enemy_health_color, (self.x + 17, self.y, 40, 5))
 
 
     '''def move(self):
@@ -227,41 +229,53 @@ def backgroundMoving():
 enemyLocations = [600, 900] 
 
 def collision():
+        global killCount
         col = 80
-        if man.x >= en.x - col and man.x <= en.x and event.type == pygame.MOUSEBUTTONDOWN and en.hp != 0:
-            en.hp -= 2
-            print("hit", en.hp)
+        if man.x >= en.x - col and man.x <= en.x and event.type == pygame.MOUSEBUTTONDOWN and en.hp > 0:
+            en.hp -= 3
+            #print("hit", en.hp)
             impactSound.play()
-        if man.x >= en1.x - col and man.x <= en1.x and event.type == pygame.MOUSEBUTTONDOWN and en1.hp != 0:
-            en1.hp -= 1
-            print("hit", en1.hp)
+        if man.x >= en1.x - col and man.x <= en1.x and event.type == pygame.MOUSEBUTTONDOWN and en1.hp > 0:
+            en1.hp -= 2
+            #print("hit", en1.hp)
             impactSound.play()
         elif en.hp > 1:
-            print("no hit",en.hp)
+            pass
+            #print("no hit",en.hp)
         else:
-            print("dead")
+            pass
+            #print("dead")
+
+        if en.hp > 0:
+            en.draw(display)
+        else:
+            if en.dieCount + 1 <= 100:
+                display.blit(en.enemyDie[en.dieCount//10], (en.x, en.y))
+                en.dieCount += 1
+                if en.dieCount == 99:
+                    en.killCount += 1
+        if en1.hp > 0:
+            en1.draw(display)
+        else:
+            if en1.dieCount + 1 <= 100:
+                display.blit(en1.enemyDie[en1.dieCount//10], (en1.x, en1.y))
+                en1.dieCount += 1
+                if en1.dieCount == 99:
+                    en.killCount += 1
+                    
+
 
 def redrawGameWindow():
     backgroundMoving()
     collision()
     playerx = font.render("player x : " + str(man.x), 1, white)
     playery = font.render("player y : " + str(man.y), 1, white)
+    kill = font.render("Kills : " + str(en.killCount), 1, white)
     hp = font.render("HP : " + str(man.hp), 1, white)
     display.blit(playerx, (780,10))
     display.blit(playery, (780,30))
     display.blit(hp, (80,23))
-    if en.hp > 0:
-        en.draw(display)
-    else:
-        if en.dieCount + 1 <= 100:
-            display.blit(en.enemyDie[en.dieCount//10], (en.x, en.y))
-            en.dieCount += 1
-    if en1.hp > 0:
-        en1.draw(display)
-    else:
-        if en1.dieCount + 1 <= 100:
-            display.blit(en1.enemyDie[en1.dieCount//10], (en1.x, en1.y))
-            en1.dieCount += 1
+    display.blit(kill, (78,45))
     man.draw(display)
     pygame.display.update()
     
@@ -269,7 +283,7 @@ def redrawGameWindow():
 run = True
 man = player(100, 440, 110, 81)
 en = enemy(enemyLocations[0], 435, 110, 81, 100)
-en1 = enemy(enemyLocations[1], 435, 110, 81, 55)
+en1 = enemy(enemyLocations[1], 435, 110, 81, 100)
 player_health = man.hp
 enemy_health = en.hp
 bg_vel = man.vel
