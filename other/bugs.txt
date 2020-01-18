@@ -1,0 +1,8 @@
+
+Known bugs:
+	
+	> can run when hit, running animation stops
+	> jump and hit problem
+	> moving in the air
+	> hit and jump only to one side
+	> swing sound sometimes not working
