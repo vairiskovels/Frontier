@@ -113,7 +113,7 @@ class player(object):
             self.idleCount += 1
         
         self.hitbox = (self.x + 32,self.y + 10,45,70)
-        pygame.draw.rect(display, (255,0,0), self.hitbox, 2)
+       #pygame.draw.rect(display, (255,0,0), self.hitbox, 2)
 
         if self.hp > 75:
             player_health_color = green
@@ -159,7 +159,7 @@ class enemy(object):
             self.walkCount += 1
 
         self.hitbox = (self.x + 12,self.y +5,45,70)
-        pygame.draw.rect(display, (255,0,0), self.hitbox, 2)
+        #pygame.draw.rect(display, (255,0,0), self.hitbox, 2)
         
         if self.hp > 75:
             enemy_health_color = green
@@ -235,8 +235,9 @@ def redrawGameWindow():
     display.blit(playerx, (780,10))
     display.blit(playery, (780,30))
     display.blit(hp, (80,23))
+    if en.hp > 0:
+        en.draw(display)
     man.draw(display)
-    en.draw(display)
     pygame.display.update()
     
 
