@@ -48,10 +48,10 @@ music = pygame.mixer.music.load("music/soundtrack.mp3")
 pygame.mixer.music.play(-1)
 
 swingSound = pygame.mixer.Sound("music/swing.wav")
-swingSound.set_volume(0.09)
+swingSound.set_volume(0.2)
 
 impactSound = pygame.mixer.Sound("music/impact.wav")
-impactSound.set_volume(0.03)
+impactSound.set_volume(0.05)
 
 grassSound = pygame.mixer.Sound("music/grass_2.wav")
 grassSound.set_volume(0.05)
@@ -135,8 +135,8 @@ class player(object):
 
             
 class enemy(object):
-    walkRight = [pygame.image.load('images/enemy/t4.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t1.png'), pygame.image.load('images/enemy/t2.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t4.png')]
-    walkLeft = [pygame.image.load('images/enemy/t4.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t1.png'), pygame.image.load('images/enemy/t2.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t4.png')]
+    stayIdle = [pygame.image.load('images/enemy/t4.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t1.png'), pygame.image.load('images/enemy/t2.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t4.png')]
+    enemyDie = [pygame.image.load("images/enemy/d1.png"), pygame.image.load("images/enemy/d2.png"), pygame.image.load("images/enemy/d3.png"), pygame.image.load("images/enemy/d4.png"), pygame.image.load("images/enemy/d5.png"), pygame.image.load("images/enemy/d6.png"), pygame.image.load("images/enemy/d7.png"), pygame.image.load("images/enemy/d8.png"), pygame.image.load("images/enemy/d9.png"), pygame.image.load("images/enemy/d10.png")]
 
     def __init__(self,x,y,width,height):
         self.x = x
@@ -145,18 +145,19 @@ class enemy(object):
         self.height = height
         #self.end = end
         self.path = [self.x]
-        self.walkCount = 0
+        self.idleCount = 0
+        self.dieCount = 0
         self.vel = 2
         self.hp = 100
         self.hitbox = (self.x + 12,self.y +5,45,70)
 
     def draw(self,display):
-        if self.walkCount + 1 >= 56:
-            self.walkCount = 0
+        if self.idleCount + 1 >= 56:
+            self.idleCount = 0
 
         if self.vel > 0: 
-            display.blit(self.walkRight[self.walkCount//8], (self.x, self.y))
-            self.walkCount += 1
+            display.blit(self.stayIdle[self.idleCount//8], (self.x, self.y))
+            self.idleCount += 1
 
         self.hitbox = (self.x + 12,self.y +5,45,70)
         #pygame.draw.rect(display, (255,0,0), self.hitbox, 2)
@@ -237,6 +238,10 @@ def redrawGameWindow():
     display.blit(hp, (80,23))
     if en.hp > 0:
         en.draw(display)
+    else:
+        if en.dieCount + 1 <= 100:
+            display.blit(en.enemyDie[en.dieCount//10], (en.x, en.y))
+            en.dieCount += 1
     man.draw(display)
     pygame.display.update()
     
