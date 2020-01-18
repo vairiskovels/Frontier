@@ -36,9 +36,12 @@ clock = pygame.time.Clock()
 black = (0,0,0)
 white = (255,255,255)
 green = (0,255,0, 130)
+greenyellow = (173,255,47)
 yellow = (255,255,0,130)
 red = (178,34,34,130) 
 orange = (255,165,0,130)
+darkorange = (255,140,0)
+
 
 fps = 60
 
@@ -57,6 +60,8 @@ grassSound = pygame.mixer.Sound("music/grass_2.wav")
 grassSound.set_volume(0.05)
 
 introImage = pygame.image.load('images/main_menu.jpg')
+
+
 
 # ======================= Functions =======================
 
@@ -138,7 +143,7 @@ class enemy(object):
     stayIdle = [pygame.image.load('images/enemy/t4.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t1.png'), pygame.image.load('images/enemy/t2.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t4.png')]
     enemyDie = [pygame.image.load("images/enemy/d1.png"), pygame.image.load("images/enemy/d2.png"), pygame.image.load("images/enemy/d3.png"), pygame.image.load("images/enemy/d4.png"), pygame.image.load("images/enemy/d5.png"), pygame.image.load("images/enemy/d6.png"), pygame.image.load("images/enemy/d7.png"), pygame.image.load("images/enemy/d8.png"), pygame.image.load("images/enemy/d9.png"), pygame.image.load("images/enemy/d10.png")]
 
-    def __init__(self,x,y,width,height):
+    def __init__(self,x,y,width,height,hp):
         self.x = x
         self.y = y
         self.width = width
@@ -148,7 +153,7 @@ class enemy(object):
         self.idleCount = 0
         self.dieCount = 0
         self.vel = 2
-        self.hp = 100
+        self.hp = hp
         self.hitbox = (self.x + 12,self.y +5,45,70)
 
     def draw(self,display):
@@ -162,18 +167,22 @@ class enemy(object):
         self.hitbox = (self.x + 12,self.y +5,45,70)
         #pygame.draw.rect(display, (255,0,0), self.hitbox, 2)
         
-        if self.hp > 75:
+        if self.hp > 90:
             enemy_health_color = green
+        elif self.hp > 75:
+            enemy_health_color = greenyellow
         elif self.hp > 50:
             enemy_health_color = yellow
         elif self.hp > 25:
             enemy_health_color = orange
+        elif self.hp > 10:
+            enemy_health_color = darkorange
         elif self.hp > 1:
             enemy_health_color = red
         else:
             enemy_health_color = black
         
-        pygame.draw.rect(display, enemy_health_color, (en.x + 15, en.y, 40, 5))
+        pygame.draw.rect(display, enemy_health_color, (self.x + 15, self.y, 40, 5))
 
 
     '''def move(self):
@@ -207,7 +216,6 @@ def game_intro():
         display.blit(introImage, (0,0))
         pygame.display.update()
 
-
         
 def backgroundMoving():
     global bg_x
@@ -215,12 +223,18 @@ def backgroundMoving():
     display.blit(bg, (bg_rel_x - bg.get_rect().width,0))
     if bg_rel_x < screenWidth:
         display.blit(bg, (bg_rel_x,0))
-    
+
+enemyLocations = [600, 900] 
+
 def collision():
         col = 80
-        if man.x >= en.x - col and man.x <= en.x and event.type == pygame.MOUSEBUTTONDOWN:
-            en.hp -= 1
+        if man.x >= en.x - col and man.x <= en.x and event.type == pygame.MOUSEBUTTONDOWN and en.hp != 0:
+            en.hp -= 2
             print("hit", en.hp)
+            impactSound.play()
+        if man.x >= en1.x - col and man.x <= en1.x and event.type == pygame.MOUSEBUTTONDOWN and en1.hp != 0:
+            en1.hp -= 1
+            print("hit", en1.hp)
             impactSound.play()
         elif en.hp > 1:
             print("no hit",en.hp)
@@ -242,17 +256,25 @@ def redrawGameWindow():
         if en.dieCount + 1 <= 100:
             display.blit(en.enemyDie[en.dieCount//10], (en.x, en.y))
             en.dieCount += 1
+    if en1.hp > 0:
+        en1.draw(display)
+    else:
+        if en1.dieCount + 1 <= 100:
+            display.blit(en1.enemyDie[en1.dieCount//10], (en1.x, en1.y))
+            en1.dieCount += 1
     man.draw(display)
     pygame.display.update()
     
 
-# ======================= Main loop =======================
 run = True
 man = player(100, 440, 110, 81)
-en = enemy(600, 435, 110, 81)
+en = enemy(enemyLocations[0], 435, 110, 81, 100)
+en1 = enemy(enemyLocations[1], 435, 110, 81, 55)
 player_health = man.hp
 enemy_health = en.hp
 bg_vel = man.vel
+
+# ======================= Main loop =======================
 
 while run:
     clock.tick(fps)
@@ -275,6 +297,7 @@ while run:
             bg_x += bg_vel
             man.vel = 0
             en.x += bg_vel
+            en1.x += bg_vel
             
 
 
@@ -287,6 +310,7 @@ while run:
             bg_x -= bg_vel 
             man.vel = 0
             en.x -= bg_vel
+            en1.x -= bg_vel
             
 
     else: 
@@ -314,7 +338,7 @@ while run:
             man.hit = False
 
     if not(man.isJump):
-        if keys[pygame.K_SPACE] or keys[pygame.K_UP]:
+        if keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]:
             man.isJump = True
             man.left = False
             man.right = False
