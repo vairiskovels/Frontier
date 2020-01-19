@@ -33,14 +33,18 @@ attack = [pygame.image.load('images/character/A1.png'), pygame.image.load('image
 
 clock = pygame.time.Clock()
 
-black = (0,0,0)
-white = (255,255,255)
-green = (0,255,0, 130)
-greenyellow = (173,255,47)
-yellow = (255,255,0,130)
-red = (178,34,34,130) 
-orange = (255,165,0,130)
-darkorange = (255,140,0)
+black = (0, 0, 0)
+white = (255, 255, 255)
+green1 = (0, 255, 64, 130)
+green2 = (0, 255, 0, 130)
+green3 = (64, 255, 0 , 130)
+limeGreen = (128, 255, 0, 130)
+greenYellow = (191, 255, 0, 130)
+yellow = (255, 255, 0, 130)
+orange = (255, 191, 0, 130)
+darkOrange = (255, 128, 0, 130)
+red1 = (255, 64, 0, 130)
+red2 = (255, 0, 0, 130)
 
 
 fps = 60
@@ -88,7 +92,11 @@ class player(object):
 
     def draw(self, display):
 
-        healthBarWidth = self.hp * 1.6
+        if self.hp > 0:
+            healthBarWidth = self.hp * 1.6
+        else:
+            healthBarWidth = 1
+
         healthBarHeight = 20
 
         healthOutWidth = 160
@@ -119,14 +127,26 @@ class player(object):
         self.hitbox = (self.x + 32,self.y + 10,45,70)
        #pygame.draw.rect(display, (255,0,0), self.hitbox, 2)
 
-        if self.hp > 75:
-            player_health_color = green
+        if self.hp > 90:
+            player_health_color = green1
+        elif self.hp > 80:
+            player_health_color = green2
+        elif self.hp > 70:
+            player_health_color = green3
+        elif self.hp > 60:
+            player_health_color = limeGreen
         elif self.hp > 50:
+            player_health_color = greenYellow
+        elif self.hp > 40:
             player_health_color = yellow
-        elif self.hp > 25:
+        elif self.hp > 30:
             player_health_color = orange
+        elif self.hp > 20:
+            player_health_color = darkOrange
+        elif self.hp > 10:
+            player_health_color = red1
         elif self.hp > 1:
-            player_health_color = red
+            player_health_color = red2
         else:
             player_health_color = black
 
@@ -141,6 +161,7 @@ class player(object):
 class enemy(object):
     stayIdle = [pygame.image.load('images/enemy/t4.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t1.png'), pygame.image.load('images/enemy/t2.png'), pygame.image.load('images/enemy/t3.png'), pygame.image.load('images/enemy/t4.png')]
     enemyDie = [pygame.image.load("images/enemy/d1.png"), pygame.image.load("images/enemy/d2.png"), pygame.image.load("images/enemy/d3.png"), pygame.image.load("images/enemy/d4.png"), pygame.image.load("images/enemy/d5.png"), pygame.image.load("images/enemy/d6.png"), pygame.image.load("images/enemy/d7.png"), pygame.image.load("images/enemy/d8.png"), pygame.image.load("images/enemy/d9.png"), pygame.image.load("images/enemy/d10.png")]
+    enemyAttack = [pygame.image.load("images/enemy/a1.png"), pygame.image.load("images/enemy/a2.png"), pygame.image.load("images/enemy/a3.png"), pygame.image.load("images/enemy/a4.png"), pygame.image.load("images/enemy/a5.png"), pygame.image.load("images/enemy/a6.png"), pygame.image.load("images/enemy/a7.png"), pygame.image.load("images/enemy/a8.png")]
 
     def __init__(self,x,y,width,height,hp):
         self.x = x
@@ -152,6 +173,7 @@ class enemy(object):
         self.idleCount = 0
         self.dieCount = 0
         self.killCount = 0
+        self.attackCount = 0
         self.vel = 2
         self.hp = hp
         self.hitbox = (self.x + 12,self.y +5,45,70)
@@ -160,8 +182,14 @@ class enemy(object):
         global killCount
         if self.idleCount + 1 >= 56:
             self.idleCount = 0
+        if self.attackCount + 1 >= 56:
+            self.attackCount -= 25
 
-        if self.vel > 0: 
+        if man.x > self.x - 200 and man.x <= self.x:
+            display.blit(self.enemyAttack[self.attackCount//7], (self.x, self.y))
+            self.attackCount += 1
+            man.hp -= 0.05
+        else: 
             display.blit(self.stayIdle[self.idleCount//8], (self.x, self.y))
             self.idleCount += 1
 
@@ -169,22 +197,45 @@ class enemy(object):
         #pygame.draw.rect(display, (255,0,0), self.hitbox, 2)
         
         if self.hp > 90:
-            enemy_health_color = green
-        elif self.hp > 75:
-            enemy_health_color = greenyellow
+            enemy_health_color = green1
+        elif self.hp > 80:
+            enemy_health_color = green2
+        elif self.hp > 70:
+            enemy_health_color = green3
+        elif self.hp > 60:
+            enemy_health_color = limeGreen
         elif self.hp > 50:
+            enemy_health_color = greenYellow
+        elif self.hp > 40:
             enemy_health_color = yellow
-        elif self.hp > 25:
+        elif self.hp > 30:
             enemy_health_color = orange
+        elif self.hp > 20:
+            enemy_health_color = darkOrange
         elif self.hp > 10:
-            enemy_health_color = darkorange
+            enemy_health_color = red1
         elif self.hp > 1:
-            enemy_health_color = red
+            enemy_health_color = red2
         else:
             enemy_health_color = black
 
-        
-        pygame.draw.rect(display, enemy_health_color, (self.x + 17, self.y, 40, 5))
+        if self.hp > 0:
+            enemyHealthBarWidth = self.hp * .4
+        else:
+            enemyHealthBarWidth = 1
+
+        enemyHealthBarHeight = 5
+
+        enemyHealthOutWidth = 40
+        enemyHealthOutHeight = 5
+
+        #pygame.draw.rect(display, enemy_health_color, (self.x + 17, self.y, 40, 5))
+
+        enemyHealthBar = pygame.Surface((enemyHealthBarWidth,enemyHealthBarHeight), pygame.SRCALPHA, 32)
+        enemyHealthBar.fill(enemy_health_color)
+        display.blit(enemyHealthBar, (self.x + 17, self.y))
+
+        pygame.draw.rect(display, black, (self.x + 17, self.y, enemyHealthOutWidth,enemyHealthOutHeight), 1)
 
 
     '''def move(self):
@@ -201,6 +252,25 @@ class enemy(object):
                 self.vel = self.vel * - 1
                 self.walkCount = 0
                 '''
+
+
+
+class projectiles(object):
+
+    bulletImg = pygame.image.load('images/enemy/bullet2.png')
+
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+        self.vel = 5
+
+    def draw(self, display):
+        if self.vel > 0: 
+            display.blit(bulletImg, (self.x, self.y))
+
+
+
+
 
 def game_intro():
     intro = True
@@ -252,7 +322,7 @@ def collision():
             if en.dieCount + 1 <= 100:
                 display.blit(en.enemyDie[en.dieCount//10], (en.x, en.y))
                 en.dieCount += 1
-                if en.dieCount == 99:
+                if en.dieCount == 10:
                     en.killCount += 1
         if en1.hp > 0:
             en1.draw(display)
@@ -260,7 +330,7 @@ def collision():
             if en1.dieCount + 1 <= 100:
                 display.blit(en1.enemyDie[en1.dieCount//10], (en1.x, en1.y))
                 en1.dieCount += 1
-                if en1.dieCount == 99:
+                if en1.dieCount == 10:
                     en.killCount += 1
                     
 
@@ -271,11 +341,14 @@ def redrawGameWindow():
     playerx = font.render("player x : " + str(man.x), 1, white)
     playery = font.render("player y : " + str(man.y), 1, white)
     kill = font.render("Kills : " + str(en.killCount), 1, white)
-    hp = font.render("HP : " + str(man.hp), 1, white)
+    if man.hp >= 0:
+        hp = font.render("HP : " + str(int(man.hp)), 1, white)
+    else:
+        hp = font.render("HP : " + str(0), 1, white)
     display.blit(playerx, (780,10))
     display.blit(playery, (780,30))
     display.blit(hp, (80,23))
-    display.blit(kill, (78,45))
+    display.blit(kill, (77,45))
     man.draw(display)
     pygame.display.update()
     
@@ -284,6 +357,7 @@ run = True
 man = player(100, 440, 110, 81)
 en = enemy(enemyLocations[0], 435, 110, 81, 100)
 en1 = enemy(enemyLocations[1], 435, 110, 81, 100)
+bullet = projectiles
 player_health = man.hp
 enemy_health = en.hp
 bg_vel = man.vel
