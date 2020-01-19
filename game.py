@@ -3,6 +3,7 @@
 import time, random, math
 import pygame
 from pygame.locals import *
+
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 
@@ -12,6 +13,7 @@ pygame.init()
 
 screenWidth = 928
 screenHeight = 557
+screenSize = (screenWidth, screenHeight)
 display = pygame.display.set_mode((screenWidth,screenHeight))
 pygame.display.set_caption("Frontier")
 
@@ -65,7 +67,6 @@ grassSound.set_volume(0.05)
 
 introImage = pygame.image.load('images/main_menu.jpg')
 
-
 # ======================= Functions =======================
 
     
@@ -91,7 +92,7 @@ class player(object):
         self.hitbox = (self.x + 32,self.y + 10,45,70)
 
     def draw(self, display):
-
+        global egx
         if self.hp > 0:
             healthBarWidth = self.hp * 1.6
         else:
@@ -156,6 +157,82 @@ class player(object):
 
         pygame.draw.rect(display, yellow, (20, 20, healthOutWidth, healthOutHeight), 2)
 
+    def handleKeys(self):
+        global bg_x, bg_vel, egx
+        keys = pygame.key.get_pressed()
+    
+        if keys[pygame.K_LEFT] and self.x > self.vel or keys[pygame.K_a] and self.x > self.vel: 
+            self.x -= self.vel
+            self.left = True
+            self.right = False
+            grassSound.play()
+            if self.x <= 376:
+                bg_x += bg_vel
+                self.vel = 0
+                en.x += bg_vel
+                en1.x += bg_vel
+                en2.x += bg_vel
+                en3.x += bg_vel
+                en4.x += bg_vel
+                en5.x += bg_vel
+
+
+        elif keys[pygame.K_RIGHT] and self.x < screenWidth - self.width - self.vel or keys[pygame.K_d] and self.x < screenWidth - self.width - self.vel:  
+            self.x += self.vel
+            self.left = False
+            self.right = True
+            grassSound.play()
+            if self.x > screenWidth / 2.5:
+                bg_x -= bg_vel 
+                self.vel = 0
+                en.x -= bg_vel
+                en1.x -= bg_vel
+                en2.x -= bg_vel
+                en3.x -= bg_vel
+                en4.x -= bg_vel
+                en5.x -= bg_vel
+
+        else: 
+            self.idle = True
+            self.left = False
+            self.right = False
+            self.walkCount = 0
+        
+        if not(self.hit):
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                swingSound.play()
+                self.hit = True
+                self.left = False
+                self.right = False
+                self.isJump = False
+
+        else:
+            if self.hitCount >= -18:
+                self.hitCount -= 1
+                self.left = False
+                self.right = False
+                self.isJump = False
+            else:
+                self.hitCount = 18
+                self.hit = False
+
+        if not(self.isJump):
+            if keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]:
+                self.isJump = True
+                self.left = False
+                self.right = False
+                self.hit = False
+                self.walkCount = 0
+        else:
+            if self.jumpCount >= -21:
+                self.y -= (self.jumpCount * abs(self.jumpCount)) * 0.06
+                self.jumpCount -= 1
+                self.left = False
+                self.right = False
+                self.hit = False
+            else: 
+                self.jumpCount = 21
+                self.isJump = False
 
             
 class enemy(object):
@@ -238,6 +315,7 @@ class enemy(object):
         pygame.draw.rect(display, black, (self.x + 17, self.y, enemyHealthOutWidth,enemyHealthOutHeight), 1)
 
 
+
     '''def move(self):
         if self.vel > 0:
             if self.x + self.vel < self.path[1]:
@@ -271,7 +349,7 @@ class projectiles(object):
 
 
 
-
+'''
 def game_intro():
     intro = True
 
@@ -287,7 +365,7 @@ def game_intro():
 
         display.blit(introImage, (0,0))
         pygame.display.update()
-
+'''
         
 def backgroundMoving():
     global bg_x
@@ -296,25 +374,48 @@ def backgroundMoving():
     if bg_rel_x < screenWidth:
         display.blit(bg, (bg_rel_x,0))
 
-enemyLocations = [600, 900] 
-
 def collision():
         global killCount
         col = 80
+
         if man.x >= en.x - col and man.x <= en.x and event.type == pygame.MOUSEBUTTONDOWN and en.hp > 0:
             en.hp -= 3
             #print("hit", en.hp)
             impactSound.play()
+
         if man.x >= en1.x - col and man.x <= en1.x and event.type == pygame.MOUSEBUTTONDOWN and en1.hp > 0:
             en1.hp -= 2
             #print("hit", en1.hp)
             impactSound.play()
+
+        if man.x >= en2.x - col and man.x <= en2.x and event.type == pygame.MOUSEBUTTONDOWN and en2.hp > 0:
+            en2.hp -= 1
+            #print("hit", en1.hp)
+            impactSound.play()
+
+        if man.x >= en3.x - col and man.x <= en3.x and event.type == pygame.MOUSEBUTTONDOWN and en3.hp > 0:
+            en3.hp -= 0.7
+            #print("hit", en1.hp)
+            impactSound.play()
+
+        if man.x >= en4.x - col and man.x <= en4.x and event.type == pygame.MOUSEBUTTONDOWN and en4.hp > 0:
+            en4.hp -= 0.7
+            #print("hit", en1.hp)
+            impactSound.play()
+
+        if man.x >= en5.x - col and man.x <= en5.x and event.type == pygame.MOUSEBUTTONDOWN and en5.hp > 0:
+            en5.hp -= 0.7
+            #print("hit", en1.hp)
+            impactSound.play()
+
         elif en.hp > 1:
             pass
             #print("no hit",en.hp)
         else:
             pass
             #print("dead")
+
+
 
         if en.hp > 0:
             en.draw(display)
@@ -324,6 +425,8 @@ def collision():
                 en.dieCount += 1
                 if en.dieCount == 10:
                     en.killCount += 1
+                    man.hp += 10
+
         if en1.hp > 0:
             en1.draw(display)
         else:
@@ -332,7 +435,49 @@ def collision():
                 en1.dieCount += 1
                 if en1.dieCount == 10:
                     en.killCount += 1
-                    
+                    man.hp += 10
+
+        if en2.hp > 0:
+            en2.draw(display)
+        else:
+            if en2.dieCount + 1 <= 100:
+                display.blit(en2.enemyDie[en2.dieCount//10], (en2.x, en2.y))
+                en2.dieCount += 1
+                if en2.dieCount == 10:
+                    en.killCount += 1
+                    man.hp += 10
+
+        if en3.hp > 0:
+            en3.draw(display)
+        else:
+            if en3.dieCount + 1 <= 100:
+                display.blit(en3.enemyDie[en3.dieCount//10], (en3.x, en3.y))
+                en3.dieCount += 1
+                if en3.dieCount == 10:
+                    en.killCount += 1
+                    man.hp += 10
+
+
+        if en4.hp > 0:
+            en4.draw(display)
+        else:
+            if en4.dieCount + 1 <= 100:
+                display.blit(en4.enemyDie[en4.dieCount//10], (en4.x, en4.y))
+                en4.dieCount += 1
+                if en4.dieCount == 10:
+                    en.killCount += 1
+                    man.hp += 10
+
+        if en5.hp > 0:
+            en5.draw(display)
+        else:
+            if en5.dieCount + 1 <= 100:
+                display.blit(en5.enemyDie[en5.dieCount//10], (en5.x, en5.y))
+                en5.dieCount += 1
+                if en5.dieCount == 10:
+                    en.killCount += 1
+                    man.hp += 10
+         
 
 
 def redrawGameWindow():
@@ -352,11 +497,18 @@ def redrawGameWindow():
     man.draw(display)
     pygame.display.update()
     
+enemyLocations = [600, 900, 1000, 1200, 1250, 1400] 
 
 run = True
 man = player(100, 440, 110, 81)
+
 en = enemy(enemyLocations[0], 435, 110, 81, 100)
 en1 = enemy(enemyLocations[1], 435, 110, 81, 100)
+en2 = enemy(enemyLocations[2], 435, 110, 81, 100)
+en3 = enemy(enemyLocations[3], 435, 110, 81, 100)
+en4 = enemy(enemyLocations[4], 435, 110, 81, 100)
+en5 = enemy(enemyLocations[5], 435, 110, 81, 100)
+
 bullet = projectiles
 player_health = man.hp
 enemy_health = en.hp
@@ -374,77 +526,7 @@ while run:
                if event.key == K_ESCAPE:
                    pygame.quit()
 
-    keys = pygame.key.get_pressed()
-    
-    if keys[pygame.K_LEFT] and man.x > man.vel or keys[pygame.K_a] and man.x > man.vel: 
-        man.x -= man.vel
-        man.left = True
-        man.right = False
-        grassSound.play()
-        if man.x <= 376:
-            bg_x += bg_vel
-            man.vel = 0
-            en.x += bg_vel
-            en1.x += bg_vel
-            
-
-
-    elif keys[pygame.K_RIGHT] and man.x < screenWidth - man.width - man.vel or keys[pygame.K_d] and man.x < screenWidth - man.width - man.vel:  
-        man.x += man.vel
-        man.left = False
-        man.right = True
-        grassSound.play()
-        if man.x > screenWidth / 2.5:
-            bg_x -= bg_vel 
-            man.vel = 0
-            en.x -= bg_vel
-            en1.x -= bg_vel
-            
-
-    else: 
-        man.idle = True
-        man.left = False
-        man.right = False
-        man.walkCount = 0
-    
-    if not(man.hit):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            swingSound.play()
-            man.hit = True
-            man.left = False
-            man.right = False
-            man.isJump = False
-
-    else:
-        if man.hitCount >= -18:
-            man.hitCount -= 1
-            man.left = False
-            man.right = False
-            man.isJump = False
-        else:
-            man.hitCount = 18
-            man.hit = False
-
-    if not(man.isJump):
-        if keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]:
-            man.isJump = True
-            man.left = False
-            man.right = False
-            man.hit = False
-            man.walkCount = 0
-    else:
-        if man.jumpCount >= -21:
-            man.y -= (man.jumpCount * abs(man.jumpCount)) * 0.06
-            man.jumpCount -= 1
-            man.left = False
-            man.right = False
-            man.hit = False
-        else: 
-            man.jumpCount = 21
-            man.isJump = False
-
-
-
+    player.handleKeys(man)
     redrawGameWindow()
     
   
