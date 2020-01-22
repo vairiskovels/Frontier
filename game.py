@@ -30,6 +30,8 @@ walkLeft = [pygame.image.load('images/character/L1.png'), pygame.image.load('ima
 jump = [pygame.image.load('images/character/J1.png'), pygame.image.load('images/character/J2.png'), pygame.image.load('images/character/J3.png'), pygame.image.load('images/character/J4.png'), pygame.image.load('images/character/J5.png'), pygame.image.load('images/character/J6.png')]
 char = [pygame.image.load('images/character/I1.png'), pygame.image.load('images/character/I2.png'), pygame.image.load('images/character/I3.png'), pygame.image.load('images/character/I4.png'), pygame.image.load('images/character/I5.png'), pygame.image.load('images/character/I6.png')]
 attack = [pygame.image.load('images/character/A1.png'), pygame.image.load('images/character/A2.png'), pygame.image.load('images/character/A3.png'), pygame.image.load('images/character/A4.png'), pygame.image.load('images/character/A5.png'), pygame.image.load('images/character/A6.png')]
+die = [pygame.image.load("images/character/D1.png"), pygame.image.load("images/character/D2.png"), pygame.image.load("images/character/D3.png"), pygame.image.load("images/character/D4.png"), pygame.image.load("images/character/D5.png"), pygame.image.load("images/character/D6.png"), pygame.image.load("images/character/D7.png")]
+
 
 # ----------------------- Other ---------------------------
 
@@ -88,7 +90,8 @@ class player(object):
         self.hitCount = 40
         self.jumpCount = 21
         self.idleCount = 6
-        self.hp = 81
+        self.dieCount = 0
+        self.hp = 100
         self.hitbox = (self.x + 32,self.y + 10,45,70)
 
     def draw(self, display):
@@ -175,6 +178,11 @@ class player(object):
                 en3.x += bg_vel
                 en4.x += bg_vel
                 en5.x += bg_vel
+                en6.x += bg_vel
+                en7.x += bg_vel
+                en8.x += bg_vel
+                en9.x += bg_vel
+                en10.x += bg_vel
 
 
         elif keys[pygame.K_RIGHT] and self.x < screenWidth - self.width - self.vel or keys[pygame.K_d] and self.x < screenWidth - self.width - self.vel:  
@@ -191,6 +199,11 @@ class player(object):
                 en3.x -= bg_vel
                 en4.x -= bg_vel
                 en5.x -= bg_vel
+                en6.x -= bg_vel
+                en7.x -= bg_vel
+                en8.x -= bg_vel
+                en9.x -= bg_vel
+                en10.x -= bg_vel
 
         else: 
             self.idle = True
@@ -352,7 +365,6 @@ class projectiles(object):
 '''
 def game_intro():
     intro = True
-
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -362,7 +374,6 @@ def game_intro():
                 if event.key == pygame.K_SPACE:
                     intro = False
                     run = True
-
         display.blit(introImage, (0,0))
         pygame.display.update()
 '''
@@ -405,6 +416,31 @@ def collision():
 
         if man.x >= en5.x - col and man.x <= en5.x and event.type == pygame.MOUSEBUTTONDOWN and en5.hp > 0:
             en5.hp -= 0.7
+            #print("hit", en1.hp)
+            impactSound.play()
+
+        if man.x >= en6.x - col and man.x <= en6.x and event.type == pygame.MOUSEBUTTONDOWN and en6.hp > 0:
+            en6.hp -= 0.7
+            #print("hit", en1.hp)
+            impactSound.play()
+
+        if man.x >= en7.x - col and man.x <= en7.x and event.type == pygame.MOUSEBUTTONDOWN and en7.hp > 0:
+            en7.hp -= 0.7
+            #print("hit", en1.hp)
+            impactSound.play()
+
+        if man.x >= en8.x - col and man.x <= en8.x and event.type == pygame.MOUSEBUTTONDOWN and en8.hp > 0:
+            en8.hp -= 0.7
+            #print("hit", en1.hp)
+            impactSound.play()
+
+        if man.x >= en9.x - col and man.x <= en9.x and event.type == pygame.MOUSEBUTTONDOWN and en9.hp > 0:
+            en9.hp -= 0.7
+            #print("hit", en1.hp)
+            impactSound.play()
+
+        if man.x >= en10.x - col and man.x <= en10.x and event.type == pygame.MOUSEBUTTONDOWN and en10.hp > 0:
+            en10.hp -= 0.7
             #print("hit", en1.hp)
             impactSound.play()
 
@@ -478,7 +514,62 @@ def collision():
                     en.killCount += 1
                     man.hp += 10
          
+        if en6.hp > 0:
+            en6.draw(display)
+        else:
+            if en6.dieCount + 1 <= 100:
+                display.blit(en6.enemyDie[en6.dieCount//10], (en6.x, en6.y))
+                en6.dieCount += 1
+                if en6.dieCount == 10:
+                    en.killCount += 1
+                    man.hp += 10
 
+        if en7.hp > 0:
+            en7.draw(display)
+        else:
+            if en7.dieCount + 1 <= 100:
+                display.blit(en7.enemyDie[en7.dieCount//10], (en7.x, en7.y))
+                en7.dieCount += 1
+                if en7.dieCount == 10:
+                    en.killCount += 1
+                    man.hp += 10
+
+        if en8.hp > 0:
+            en8.draw(display)
+        else:
+            if en8.dieCount + 1 <= 100:
+                display.blit(en8.enemyDie[en8.dieCount//10], (en8.x, en8.y))
+                en8.dieCount += 1
+                if en8.dieCount == 10:
+                    en.killCount += 1
+                    man.hp += 10
+
+        if en9.hp > 0:
+            en9.draw(display)
+        else:
+            if en9.dieCount + 1 <= 100:
+                display.blit(en9.enemyDie[en9.dieCount//10], (en9.x, en9.y))
+                en9.dieCount += 1
+                if en9.dieCount == 10:
+                    en.killCount += 1
+                    man.hp += 10
+
+        if en10.hp > 0:
+            en10.draw(display)
+        else:
+            if en10.dieCount + 1 <= 100:
+                display.blit(en10.enemyDie[en10.dieCount//10], (en10.x, en10.y))
+                en10.dieCount += 1
+                if en10.dieCount == 10:
+                    en.killCount += 1
+                    man.hp += 10
+
+        if man.hp > 0:
+            man.draw(display)
+        else:
+            if man.dieCount + 1 <= 56:
+                display.blit(man.die[man.dieCount//8], (man.x, man.y))
+                man.dieCount += 1
 
 def redrawGameWindow():
     backgroundMoving()
@@ -490,14 +581,14 @@ def redrawGameWindow():
         hp = font.render("HP : " + str(int(man.hp)), 1, white)
     else:
         hp = font.render("HP : " + str(0), 1, white)
-    display.blit(playerx, (780,10))
-    display.blit(playery, (780,30))
+    #display.blit(playerx, (780,10))
+    #display.blit(playery, (780,30))
     display.blit(hp, (80,23))
     display.blit(kill, (77,45))
-    man.draw(display)
+    #man.draw(display)
     pygame.display.update()
     
-enemyLocations = [600, 900, 1000, 1200, 1250, 1400] 
+enemyLocations = [600, 900, 1000, 1200, 1250, 1400, 1700, 1800, 1950, 2100, 2200] 
 
 run = True
 man = player(100, 440, 110, 81)
@@ -508,6 +599,11 @@ en2 = enemy(enemyLocations[2], 435, 110, 81, 100)
 en3 = enemy(enemyLocations[3], 435, 110, 81, 100)
 en4 = enemy(enemyLocations[4], 435, 110, 81, 100)
 en5 = enemy(enemyLocations[5], 435, 110, 81, 100)
+en6 = enemy(enemyLocations[6], 435, 110, 81, 100)
+en7 = enemy(enemyLocations[7], 435, 110, 81, 100)
+en8 = enemy(enemyLocations[8], 435, 110, 81, 100)
+en9 = enemy(enemyLocations[9], 435, 110, 81, 100)
+en10 = enemy(enemyLocations[10], 435, 110, 81, 100)
 
 bullet = projectiles
 player_health = man.hp
